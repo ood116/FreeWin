@@ -12,11 +12,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkManager instance;
     private NetworkRunner runner;
+
+    [Header("===Session===")]
     public List<SessionInfo> sessionInfo = new List<SessionInfo>();
-    public SessionListManager sessionListManager = null;
+    public Action<List<SessionInfo>> sessionListUpdateAction;
 
     private void Awake()
     {
+        Screen.SetResolution(800, 600, false);
+
         if (instance == null) {
             instance = this;
             runner = this.AddComponent<NetworkRunner>();
@@ -28,6 +32,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         
     }
     
+    // Login -> Lobby
     async public void ConnectToLobby(string playerName)
     {
         // Create the NetworkSceneInfo from the current scene
@@ -39,34 +44,46 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         // Go to Lobby
         var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
+
         if (result.Ok) {
             SceneManager.LoadScene("Assets/Association/_Scene/Lobby.unity");
         }
     }
-
-    async public void StartGame(GameMode mode)
+    
+    // Lobby -> Session
+    async public void CreateSession(string sessionName)
     {
-        // Create the Fusion runner and let it know that we will be providing user input
-        if (runner == null) {
-            runner = gameObject.AddComponent<NetworkRunner>();
-            runner.ProvideInput = true;
-        }
-
-        // Create the NetworkSceneInfo from the current scene
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-        var sceneInfo = new NetworkSceneInfo();
-        if (scene.IsValid) {
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-        }
-
         // Start or join (depends on gamemode) a session with a specific name
-        await runner.StartGame(new StartGameArgs()
+        var result = await runner.StartGame(new StartGameArgs()
         {
-            GameMode = mode,
-            SessionName = "TestRoom",
-            Scene = scene,
+            GameMode = GameMode.AutoHostOrClient,
+            SessionName = sessionName,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
+
+        if (result.Ok) {
+            SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
+        }
+    }
+
+    // Lobby -> Session
+    async public void ConnectToSession(string sessionName)
+    {
+        var result = await runner.StartGame(new StartGameArgs()
+        {
+            GameMode = GameMode.AutoHostOrClient,
+            SessionName = sessionName,
+        });
+
+        if (result.Ok) {
+            SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
+        }
+    }
+
+    // Session -> Lobby
+    async public void DisConnectSession()
+    {
+        await runner.Shutdown(true, ShutdownReason.Ok);
     }
 
     public void OnConnectedToServer(NetworkRunner runner)
@@ -121,7 +138,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        
+        //runner.ProvideInput = true;
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -151,15 +168,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        Debug.Log("OnSessionListUpdated " + sessionList.Count);
-        sessionInfo.Clear();
-        sessionInfo = sessionList.ToList();
-        sessionListManager?.UpdateRoomList();
+        sessionListUpdateAction?.Invoke(sessionList);
     }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        
+        SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
