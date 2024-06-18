@@ -8,40 +8,23 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallbacks
 {
-    public static NetworkManager instance;
     private NetworkRunner runner;
-
-    [Header("===Session===")]
-    public List<SessionInfo> sessionInfo = new List<SessionInfo>();
     public Action<List<SessionInfo>> sessionListUpdateAction;
 
     private void Awake()
     {
         Screen.SetResolution(800, 600, false);
-
-        if (instance == null) {
-            instance = this;
-            runner = this.AddComponent<NetworkRunner>();
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else {
-            Destroy(this.gameObject);
-        }
-        
+        runner = this.AddComponent<NetworkRunner>();
+        GetRunnerState();
     }
     
-    // Login -> Lobby
-    async public void ConnectToLobby(string playerName)
-    {
-        // Create the NetworkSceneInfo from the current scene
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-        var sceneInfo = new NetworkSceneInfo();
-        if (scene.IsValid) {
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-        }
+    public NetworkRunner.States GetRunnerState() { return runner.State; }
 
+#region Login -> Lobby
+    async public void ConnectToLobby(string nickName)
+    {
         // Go to Lobby
         var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
 
@@ -49,11 +32,27 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager.LoadScene("Assets/Association/_Scene/Lobby.unity");
         }
     }
-    
-    // Lobby -> Session
+#endregion
+
+#region Lobby -> Session (Host)
     async public void CreateSession(string sessionName)
     {
-        // Start or join (depends on gamemode) a session with a specific name
+        var result = await runner.StartGame(new StartGameArgs()
+        {
+            GameMode = GameMode.Host,
+            SessionName = sessionName,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+        });
+
+        if (result.Ok) {
+            SceneManager.LoadScene("Assets/Association/_Scene/Session.unity");
+        }
+    }
+#endregion
+
+#region Lobby -> Session (Auto)
+    async public void ConnectToSession(string sessionName)
+    {
         var result = await runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.AutoHostOrClient,
@@ -62,108 +61,23 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         });
 
         if (result.Ok) {
-            SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
+            SceneManager.LoadScene("Assets/Association/_Scene/Session.unity");
         }
     }
+#endregion
 
-    // Lobby -> Session
-    async public void ConnectToSession(string sessionName)
-    {
-        var result = await runner.StartGame(new StartGameArgs()
-        {
-            GameMode = GameMode.AutoHostOrClient,
-            SessionName = sessionName,
-        });
-
-        if (result.Ok) {
-            SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
-        }
-    }
-
-    // Session -> Lobby
+#region Session -> Lobby
     async public void DisConnectSession()
     {
         await runner.Shutdown(true, ShutdownReason.Ok);
+        ConnectToLobby(UserData.Instance.NickName);
     }
 
-    public void OnConnectedToServer(NetworkRunner runner)
-    {
-        
-    }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-    {
-        
-    }
-
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-    {
-        
-    }
-
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-    {
-        
-    }
-
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
-    {
-        
-    }
-
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-    {
-        
-    }
-
-    public void OnInput(NetworkRunner runner, NetworkInput input)
-    {
-        
-    }
-
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-    {
-        
-    }
-
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        
-    }
-
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        
-    }
+#endregion
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         //runner.ProvideInput = true;
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-        
-    }
-
-    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
-    {
-        
-    }
-
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
-    {
-        
-    }
-
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        
-    }
-
-    public void OnSceneLoadStart(NetworkRunner runner)
-    {
-        
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -171,13 +85,39 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         sessionListUpdateAction?.Invoke(sessionList);
     }
 
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-    {
-        SceneManager.LoadScene("Assets/Association/_Scene/Game.unity");
-    }
+#region Not Using
+    public void OnConnectedToServer(NetworkRunner runner) { }
 
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-    {
-        
-    }
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+
+    public void OnSceneLoadDone(NetworkRunner runner) { }
+
+    public void OnSceneLoadStart(NetworkRunner runner) { }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+#endregion
 }

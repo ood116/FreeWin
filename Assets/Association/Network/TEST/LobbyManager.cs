@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -24,9 +25,12 @@ public class LobbyManager : MonoBehaviour
     private void Awake()
     {
         roomName = "Test" + Random.Range(0, 999999);
+        if (NetworkManager.Instance.GetRunnerState() != NetworkRunner.States.Starting) {
+            NetworkManager.Instance.ConnectToLobby(UserData.Instance.NickName);
+        }
     }
 
-    public void Create() => NetworkManager.instance.CreateSession(roomName);
+    public void Create() => NetworkManager.Instance.CreateSession(roomName);
 
-    public void Join() => NetworkManager.instance.ConnectToSession(roomName);
+    public void Join() => NetworkManager.Instance.ConnectToSession(roomName);
 }

@@ -38,7 +38,7 @@ public class SessionListManager : MonoBehaviour
 
     private void JoinRoom(string sessionName) 
     {
-        NetworkManager.instance.ConnectToSession(sessionName);
+        NetworkManager.Instance.ConnectToSession(sessionName);
     }
 
     private void UpdateRoomList()
@@ -66,7 +66,7 @@ public class SessionListManager : MonoBehaviour
         }
     }
 
-#region  Get SessionList from NetworkManager
+#region Get SessionList from NetworkManager
     private void SessionListUpdate(List<SessionInfo> sessionList)
     {
         sessionInfo = sessionList.ToList();
@@ -75,12 +75,12 @@ public class SessionListManager : MonoBehaviour
 
     private void OnEnable()
     {
-        NetworkManager.instance.sessionListUpdateAction += SessionListUpdate;
+        NetworkManager.Instance.sessionListUpdateAction += SessionListUpdate;
     }
 
     private void OnDisable()
     {
-        NetworkManager.instance.sessionListUpdateAction -= SessionListUpdate;
+        NetworkManager.Instance.sessionListUpdateAction -= SessionListUpdate;
     }
 #endregion
 }

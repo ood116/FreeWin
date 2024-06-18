@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 public class LoginManager : MonoBehaviour
 {
@@ -17,10 +18,10 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void Start()
     {
-        nickName = "Test" + Random.Range(0, 999999);
+        nickName = UserData.Instance.NickName;
     }
 
-    public void Login(string nickName) => NetworkManager.instance.ConnectToLobby(nickName);
+    public void Login(string nickName) => NetworkManager.Instance.ConnectToLobby(nickName);
 }
