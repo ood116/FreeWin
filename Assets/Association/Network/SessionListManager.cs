@@ -52,12 +52,13 @@ public class SessionListManager : MonoBehaviour
 
         multiple = (currentPage - 1) * roomButton.Length;
         for (int i = 0; i < roomButton.Length; ++i) {
+            int num = i;
             if (multiple + i < sessionInfo.Count) {
-                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionInfo[multiple + i].Name;
+                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionInfo[multiple + num].Name;
                 roomButton[i].interactable = true;
 
                 roomButton[i].onClick.RemoveAllListeners();
-                roomButton[i].onClick.AddListener(() => JoinRoom(sessionInfo[multiple + i].Name));
+                roomButton[i].onClick.AddListener(() => JoinRoom(sessionInfo[multiple + num].Name));
             }
             else {
                 roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = "";

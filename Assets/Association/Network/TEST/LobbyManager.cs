@@ -24,9 +24,10 @@ public class LobbyManager : MonoBehaviour
 
     private void Awake()
     {
-        roomName = "Test" + Random.Range(0, 999999);
+        roomName = "Session_" + Random.Range(0, 999999);
+
         if (NetworkManager.Instance.GetRunnerState() != NetworkRunner.States.Starting) {
-            NetworkManager.Instance.ConnectToLobby(UserData.Instance.NickName);
+            NetworkManager.Instance.ConnectToLobby();
         }
     }
 

@@ -5,27 +5,21 @@ using UnityEngine;
 public class UserData : MonoSingleton<UserData>
 {
     // NickName
-    private string nickName;
-    public string NickName
+    private string _nickName;
+    public string nickName
     {
         get 
         {
-            if (nickName == null) {
-                if (PlayerPrefs.HasKey("NickName")) NickName = PlayerPrefs.GetString("NickName");
-                else NickName = "Test" + Random.Range(0, 999999);
+            if (_nickName == null) {
+                if (PlayerPrefs.HasKey("NickName")) nickName = PlayerPrefs.GetString("NickName");
+                else nickName = "Guest" + Random.Range(0, 999999);
             }
-            return nickName; 
+            return _nickName; 
         }
         set 
         { 
-            nickName = value;
+            _nickName = value;
             PlayerPrefs.SetString("NickName", value);
         }
-    }
-
-    [ContextMenu("PlayerPrefs Clear")]
-    public void PlayerPrefsClear()
-    {
-        PlayerPrefs.DeleteAll();
     }
 }

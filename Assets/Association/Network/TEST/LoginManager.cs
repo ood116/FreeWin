@@ -14,14 +14,20 @@ public class LoginManager : MonoBehaviour
         
         // Go To Lobby
         if (GUI.Button(new Rect(0,50,200,40), "Lobby")) {
-            Login(nickName);
+            Login();
         }
     }
 
     private void Start()
     {
-        nickName = UserData.Instance.NickName;
+        nickName = UserData.Instance.nickName;
     }
 
-    public void Login(string nickName) => NetworkManager.Instance.ConnectToLobby(nickName);
+    public void SetNickName() => UserData.Instance.nickName = nickName;
+
+    public void Login()
+    {
+        SetNickName();
+        NetworkManager.Instance.ConnectToLobby();
+    }
 }

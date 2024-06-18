@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallbacks
 {
-    private NetworkRunner runner;
+    public NetworkRunner runner;
     public Action<List<SessionInfo>> sessionListUpdateAction;
 
     private void Awake()
@@ -23,19 +23,20 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     public NetworkRunner.States GetRunnerState() { return runner.State; }
 
 #region Login -> Lobby
-    async public void ConnectToLobby(string nickName)
+    async public void ConnectToLobby(Action callBack = null)
     {
         // Go to Lobby
         var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
 
         if (result.Ok) {
             SceneManager.LoadScene("Assets/Association/_Scene/Lobby.unity");
+            callBack?.Invoke();
         }
     }
 #endregion
 
 #region Lobby -> Session (Host)
-    async public void CreateSession(string sessionName)
+    async public void CreateSession(string sessionName, Action callBack = null)
     {
         var result = await runner.StartGame(new StartGameArgs()
         {
@@ -46,12 +47,13 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
 
         if (result.Ok) {
             SceneManager.LoadScene("Assets/Association/_Scene/Session.unity");
+            callBack?.Invoke();
         }
     }
 #endregion
 
 #region Lobby -> Session (Auto)
-    async public void ConnectToSession(string sessionName)
+    async public void ConnectToSession(string sessionName, Action callBack = null)
     {
         var result = await runner.StartGame(new StartGameArgs()
         {
@@ -62,6 +64,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
 
         if (result.Ok) {
             SceneManager.LoadScene("Assets/Association/_Scene/Session.unity");
+            callBack?.Invoke();
         }
     }
 #endregion
@@ -70,7 +73,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     async public void DisConnectSession()
     {
         await runner.Shutdown(true, ShutdownReason.Ok);
-        ConnectToLobby(UserData.Instance.NickName);
+        ConnectToLobby();
     }
 
 #endregion
