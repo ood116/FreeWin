@@ -31,7 +31,7 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    public void Create() => NetworkManager.Instance.CreateSession(roomName);
+    public void Create() => NetworkManager.Instance.ConnectSession(roomName, GameMode.Host);
 
-    public void Join() => NetworkManager.Instance.ConnectToSession(roomName);
+    public void Join() => NetworkManager.Instance.ConnectSession(roomName, GameMode.AutoHostOrClient);
 }

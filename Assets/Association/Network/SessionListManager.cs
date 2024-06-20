@@ -11,7 +11,7 @@ public class SessionListManager : MonoBehaviour
     public Button[] roomButton;
     public Button previous_Page_Button, next_Page_Button;
     int currentPage = 1, maxPage, multiple;
-    private List<SessionInfo> sessionInfo = new List<SessionInfo>();
+    private List<SessionInfo> sessionList = new List<SessionInfo>();
 
     private void Awake()
     {
@@ -38,13 +38,13 @@ public class SessionListManager : MonoBehaviour
 
     private void JoinRoom(string sessionName) 
     {
-        NetworkManager.Instance.ConnectToSession(sessionName);
+        NetworkManager.Instance.ConnectSession(sessionName, GameMode.AutoHostOrClient);
     }
 
     private void UpdateRoomList()
     {
         // Calculate Page
-        maxPage = (sessionInfo.Count % roomButton.Length == 0) ? sessionInfo.Count / roomButton.Length : sessionInfo.Count / roomButton.Length + 1;
+        maxPage = (sessionList.Count % roomButton.Length == 0) ? sessionList.Count / roomButton.Length : sessionList.Count / roomButton.Length + 1;
 
         // Button Setting
         previous_Page_Button.interactable = (currentPage <= 1) ? false : true;
@@ -53,12 +53,12 @@ public class SessionListManager : MonoBehaviour
         multiple = (currentPage - 1) * roomButton.Length;
         for (int i = 0; i < roomButton.Length; ++i) {
             int num = i;
-            if (multiple + i < sessionInfo.Count) {
-                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionInfo[multiple + num].Name;
+            if (multiple + i < sessionList.Count) {
+                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionList[multiple + num].Name;
                 roomButton[i].interactable = true;
 
                 roomButton[i].onClick.RemoveAllListeners();
-                roomButton[i].onClick.AddListener(() => JoinRoom(sessionInfo[multiple + num].Name));
+                roomButton[i].onClick.AddListener(() => JoinRoom(sessionList[multiple + num].Name));
             }
             else {
                 roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = "";
@@ -70,13 +70,15 @@ public class SessionListManager : MonoBehaviour
 #region Get SessionList from NetworkManager
     private void SessionListUpdate(List<SessionInfo> sessionList)
     {
-        sessionInfo = sessionList.ToList();
+        this.sessionList.Clear();
+        this.sessionList = sessionList.ToList();
         UpdateRoomList();
     }
 
     private void OnEnable()
     {
         NetworkManager.Instance.sessionListUpdateAction += SessionListUpdate;
+        SessionListUpdate(NetworkManager.Instance.sessionList);
     }
 
     private void OnDisable()

@@ -6,6 +6,7 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T instance = null;
     private static object lockObject = new object();
+    private static bool isQuitting = false;
 
     public static T Instance
     {
@@ -13,10 +14,13 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
         {
             lock (lockObject)
             {
+                if (isQuitting) return null;
+
                 if (instance == null) {
-                    instance = new GameObject().AddComponent<T>();
-                    instance.name = typeof(T).ToString();
-                    DontDestroyOnLoad(instance.gameObject);
+                    GameObject singletonObj = new GameObject();
+                    instance = singletonObj.AddComponent<T>();
+                    singletonObj.name = typeof(T).ToString();
+                    DontDestroyOnLoad(singletonObj.gameObject);
                 }
                 return instance;
             }
@@ -31,5 +35,6 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     private void OnApplicationQuit()
     {
         instance = null;
+        isQuitting = true;
     }
 }

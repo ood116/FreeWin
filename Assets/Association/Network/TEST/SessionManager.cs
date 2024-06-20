@@ -26,8 +26,11 @@ public class SessionManager : MonoBehaviour
     private void Awake()
     {
         if (NetworkManager.Instance.GetRunnerState() != NetworkRunner.States.Running) {
-            roomName = "Session_" + Random.Range(0, 999999);
-            NetworkManager.Instance.ConnectToSession(roomName, GetSessionName);
+#if UNITY_EDITOR
+            NetworkManager.Instance.ConnectSession("Session_Editor", GameMode.AutoHostOrClient, callBack: GetSessionName);
+#else
+            Lobby();
+#endif
         }
         else if (NetworkManager.Instance.GetRunnerState() == NetworkRunner.States.Running) {
             GetSessionName();

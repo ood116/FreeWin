@@ -11,8 +11,10 @@ public class UserData : MonoSingleton<UserData>
         get 
         {
             if (_nickName == null) {
-                if (PlayerPrefs.HasKey("NickName")) nickName = PlayerPrefs.GetString("NickName");
-                else nickName = "Guest" + Random.Range(0, 999999);
+                if (PlayerPrefs.HasKey("NickName"))
+                    nickName = PlayerPrefs.GetString("NickName");
+                else 
+                    nickName = "Guest" + Random.Range(0, 999999);
             }
             return _nickName; 
         }
