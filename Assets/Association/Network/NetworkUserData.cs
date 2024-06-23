@@ -5,12 +5,15 @@ using Fusion;
 
 public class NetworkUserData : NetworkBehaviour
 {
-    [Networked, OnChangedRender(nameof(NicknameChanged))]
-    public string networkedNickname { get; set; } = UserData.Instance.nickName;
-    void NicknameChanged() { UserData.Instance.nickName = networkedNickname; }
+    // Nick Name
+    [Networked] public string nickName { get; set; }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetNickName(string nickName, RpcInfo info = default) {  this.nickName = nickName; }
 
-    void Start()
+    public override void Spawned()
     {
-        networkedNickname = UserData.Instance.nickName;
+        if (Object.HasInputAuthority) {
+            RPC_SetNickName(UserData.instance.nickName);
+        }
     }
 }

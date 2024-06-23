@@ -26,12 +26,12 @@ public class LobbyManager : MonoBehaviour
     {
         roomName = "Session_" + Random.Range(0, 999999);
 
-        if (NetworkManager.Instance.GetRunnerState() != NetworkRunner.States.Starting) {
-            NetworkManager.Instance.ConnectToLobby();
+        if (NetworkManager.instance.GetRunnerState() != NetworkRunner.States.Starting) {
+            NetworkManager.instance.ConnectToLobby();
         }
     }
 
-    public void Create() => NetworkManager.Instance.ConnectSession(roomName, GameMode.Host);
+    public void Create() => NetworkManager.instance.ConnectSession(roomName, GameMode.Host);
 
-    public void Join() => NetworkManager.Instance.ConnectSession(roomName, GameMode.AutoHostOrClient);
+    public void Join() => NetworkManager.instance.ConnectSession(roomName, GameMode.AutoHostOrClient);
 }

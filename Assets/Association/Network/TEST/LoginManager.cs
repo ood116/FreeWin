@@ -20,14 +20,14 @@ public class LoginManager : MonoBehaviour
 
     private void Start()
     {
-        nickName = UserData.Instance.nickName;
+        nickName = UserData.instance.nickName;
     }
 
-    public void SetNickName() => UserData.Instance.nickName = nickName;
+    public void SetNickName() => UserData.instance.nickName = nickName;
 
     public void Login()
     {
         SetNickName();
-        NetworkManager.Instance.ConnectToLobby();
+        NetworkManager.instance.ConnectToLobby();
     }
 }

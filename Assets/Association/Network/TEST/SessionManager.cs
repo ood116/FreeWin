@@ -25,28 +25,28 @@ public class SessionManager : MonoBehaviour
 
     private void Awake()
     {
-        if (NetworkManager.Instance.GetRunnerState() != NetworkRunner.States.Running) {
+        if (NetworkManager.instance.GetRunnerState() != NetworkRunner.States.Running) {
 #if UNITY_EDITOR
-            NetworkManager.Instance.ConnectSession("Session_Editor", GameMode.AutoHostOrClient, callBack: GetSessionName);
+            NetworkManager.instance.ConnectSession("Session_Editor", GameMode.AutoHostOrClient, callBack: GetSessionName);
 #else
             Lobby();
 #endif
         }
-        else if (NetworkManager.Instance.GetRunnerState() == NetworkRunner.States.Running) {
+        else if (NetworkManager.instance.GetRunnerState() == NetworkRunner.States.Running) {
             GetSessionName();
         }
     }
 
-    public void Lobby() => NetworkManager.Instance.DisConnectSession();
+    public void Lobby() => NetworkManager.instance.DisConnectSession();
 
     public void GetSessionName()
     {
-        roomName = NetworkManager.Instance.runner.SessionInfo.Name;
+        roomName = NetworkManager.instance.runner.SessionInfo.Name;
     }
 
     public void GetSessionPlayers()
     {
-        SessionInfo session = NetworkManager.Instance.runner.SessionInfo;
+        SessionInfo session = NetworkManager.instance.runner.SessionInfo;
 
         for(int i = 0; i < session.PlayerCount; ++i) {
             

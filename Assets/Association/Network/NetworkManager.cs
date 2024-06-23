@@ -84,15 +84,21 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         if (runner.IsServer) {
             GameObject playerObj = Resources.Load<GameObject>("Prefabs/Player");
             NetworkObject networkPlayerObject = runner.Spawn(playerObj, Vector2.zero, Quaternion.identity, player);
+            networkPlayerObject.name = networkPlayerObject.InputAuthority.ToString();
             networkPlayer.Add(player, networkPlayerObject);
         }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        if (networkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
-            runner.Despawn(networkObject);
-            networkPlayer.Remove(player);
+        if (runner.IsServer) { // Left Not Server
+            if (networkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
+                runner.Despawn(networkObject);
+                networkPlayer.Remove(player);
+            }
+        }
+        else { // Left Server Change Host
+            
         }
     }
 
@@ -103,6 +109,11 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         sessionListUpdateAction?.Invoke(sessionList);
     }
 #endregion
+
+    public NetworkObject GetLocalPlayer()
+    {
+        return runner.GetPlayerObject(runner.LocalPlayer);
+    }
 
 #region Not Using Event
     // Debug.Log(MethodBase.GetCurrentMethod().Name);

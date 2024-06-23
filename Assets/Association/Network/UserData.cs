@@ -5,7 +5,7 @@ using UnityEngine;
 public class UserData : MonoSingleton<UserData>
 {
     // NickName
-    private string _nickName;
+    [SerializeField] private string _nickName;
     public string nickName
     {
         get 

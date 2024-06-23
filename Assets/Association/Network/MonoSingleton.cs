@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static T instance = null;
+    protected MonoSingleton() { }
+    private static T _instance = null;
     private static object lockObject = new object();
     private static bool isQuitting = false;
 
-    public static T Instance
+    public static T instance
     {
         get
         {
@@ -16,25 +17,25 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
             {
                 if (isQuitting) return null;
 
-                if (instance == null) {
+                if (_instance == null) {
                     GameObject singletonObj = new GameObject();
-                    instance = singletonObj.AddComponent<T>();
+                    _instance = singletonObj.AddComponent<T>();
                     singletonObj.name = typeof(T).ToString();
                     DontDestroyOnLoad(singletonObj.gameObject);
                 }
-                return instance;
+                return _instance;
             }
         }
     }
 
     private void OnDisable()
     {
-        instance = null;
+        _instance = null;
     }
 
     private void OnApplicationQuit()
     {
-        instance = null;
+        _instance = null;
         isQuitting = true;
     }
 }
