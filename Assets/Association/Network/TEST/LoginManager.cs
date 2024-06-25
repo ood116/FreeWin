@@ -10,10 +10,11 @@ public class LoginManager : MonoBehaviour
     private void OnGUI()
     {
         // Set Nick Name
-        nickName = GUI.TextField(new Rect (0, 0, 200, 40), nickName);
+        GUI.Box(new Rect(0, 0, 200, 60), "NickName");
+        nickName = GUI.TextField(new Rect (10, 20, 180, 30), nickName);
         
         // Go To Lobby
-        if (GUI.Button(new Rect(0,50,200,40), "Lobby")) {
+        if (GUI.Button(new Rect(0,70,200,40), "Go To Lobby")) {
             Login();
         }
     }

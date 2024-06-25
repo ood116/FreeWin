@@ -16,6 +16,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     public Action<List<SessionInfo>> sessionListUpdateAction;
     public List<SessionInfo> sessionList = new List<SessionInfo>();
     private Dictionary<PlayerRef, NetworkObject> networkPlayer = new Dictionary<PlayerRef, NetworkObject>();
+    private bool isConnecting = false;
 
     private void Awake()
     {
@@ -29,6 +30,8 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
 #region Login -> Lobby
     async public void ConnectToLobby(Action callBack = null)
     {
+        if (isConnecting) return;
+
         // Go to Lobby
         var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
         
@@ -37,6 +40,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
             SceneManager.LoadScene("Assets/Association/_Scene/Lobby.unity");
             runner.ProvideInput = false;
             callBack?.Invoke();
+            isConnecting = false;
         }
     }
 #endregion
@@ -44,6 +48,8 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
 #region Lobby -> Session
     async public void ConnectSession(string sessionName, GameMode gameMode, string sceneName = "Session", Action callBack = null)
     {
+        if (isConnecting) return;
+
         // Set Session Scene
         string sessionSceneName = "Assets/Association/_Scene/" + sceneName + ".unity";
         var scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(sessionSceneName));
@@ -72,6 +78,8 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
 #region Session -> Lobby
     async public void DisConnectSession()
     {
+        if (isConnecting) return;
+
         // Reset And Goto Lobby
         await runner.Shutdown(true, ShutdownReason.Ok);
         ConnectToLobby();
