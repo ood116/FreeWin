@@ -13,22 +13,23 @@ public class UICreationControls : MonoBehaviour
     public GameObject objMainPar;
     public GameObject objMain;
     [Space]
-    public string[] nameHor = new string[]
+    public string objNameBase = "ObjRepeat_";
+    public string mainNamePar = "RepeatPar_";
+
+    private string[] nameHor = new string[]
     {
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
         "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
         "U", "V", "W", "X", "Y", "Z"
     };
-    public string[] nameVer = new string[]
+    private string[] nameVer = new string[]
     {
         "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
         "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
         "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-        "31", "32", "33", "34", "35", "36", "37", "38", "39"
+        "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
+        "41"
     };
-    [Space]
-    public string objNameBase = "ObjRepeat_";
-    public string mainNamePar = "RepeatPar_";
 
     private SelectionArea areaData = new SelectionArea();
 
