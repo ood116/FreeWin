@@ -6,14 +6,10 @@ using Fusion;
 public class NetworkUserData : NetworkBehaviour
 {
     // Nick Name
-    [Networked] public string nickName { get; set; }
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetNickName(string nickName, RpcInfo info = default) {  this.nickName = nickName; }
+    [Networked, OnChangedRender(nameof(NickNameChanged))] public string nickName { get; set; } = "";
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)] public void RPC_SetNickName(string nickName, RpcInfo info = default) {  this.nickName = nickName; }
+    public override void Spawned() { if (Object.HasInputAuthority) RPC_SetNickName(UserData.instance.nickName); }
 
-    public override void Spawned()
-    {
-        if (Object.HasInputAuthority) {
-            RPC_SetNickName(UserData.instance.nickName);
-        }
-    }
+    // NickName Update
+    public void NickNameChanged() { SessionManager.instance.SetSessionPlayers(); }
 }

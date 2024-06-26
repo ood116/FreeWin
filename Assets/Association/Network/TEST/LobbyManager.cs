@@ -24,9 +24,9 @@ public class LobbyManager : MonoBehaviour
         }
 
         // Join Room
-        //if (GUI.Button(new Rect(210,120,200,40), "Join Room")) {
-        //    Join();
-        //}
+        if (GUI.Button(new Rect(210,120,200,40), "Join Room")) {
+            Join();
+        }
     }
 
     private void Awake()

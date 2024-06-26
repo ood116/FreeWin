@@ -6,6 +6,8 @@ using Fusion;
 public class LoginManager : MonoBehaviour
 {
     private string nickName;
+    private UIControls uIControls;
+    private UICreationControls uICreationControls;
 
     private void OnGUI()
     {
@@ -17,6 +19,13 @@ public class LoginManager : MonoBehaviour
         if (GUI.Button(new Rect(0,70,200,40), "Go To Lobby")) {
             Login();
         }
+    }
+
+    private void Awake()
+    {
+        var CanvControl = GameObject.Find("CanvControl");
+        uIControls = CanvControl.GetComponentInChildren<UIControls>();
+        uICreationControls = CanvControl.GetComponentInChildren<UICreationControls>();
     }
 
     private void Start()

@@ -13,9 +13,21 @@ using System.Reflection;
 public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallbacks
 {
     public NetworkRunner runner;
+
+    // Session
     public Action<List<SessionInfo>> sessionListUpdateAction;
     public List<SessionInfo> sessionList = new List<SessionInfo>();
-    private Dictionary<PlayerRef, NetworkObject> networkPlayer = new Dictionary<PlayerRef, NetworkObject>();
+
+    // Player
+    public Action networkPlayerUpdateAction;
+    public Dictionary<PlayerRef, NetworkObject> networkPlayer = new Dictionary<PlayerRef, NetworkObject>();
+    public Dictionary<PlayerRef, NetworkObject> NetworkPlayer
+    {
+        get { return networkPlayer; }
+        set { networkPlayer = value; networkPlayerUpdateAction?.Invoke(); }
+    }
+    
+    // ETC
     private bool isConnecting = false;
 
     private void Awake()
@@ -71,6 +83,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         if (result.Ok) {
             runner.ProvideInput = true;
             callBack?.Invoke();
+            isConnecting = false;
         }
     }
 #endregion
@@ -93,20 +106,17 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
             GameObject playerObj = Resources.Load<GameObject>("Prefabs/Player");
             NetworkObject networkPlayerObject = runner.Spawn(playerObj, Vector2.zero, Quaternion.identity, player);
             networkPlayerObject.name = networkPlayerObject.InputAuthority.ToString();
-            networkPlayer.Add(player, networkPlayerObject);
+            NetworkPlayer.Add(player, networkPlayerObject);
+            networkPlayerUpdateAction?.Invoke(); // 닉네임 이 바로 변경 되지 않기 때문에 개선 필요 (현재 Player - NetworkUserData 에서 작동 됨)
         }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer) { // Left Not Server
-            if (networkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
-                runner.Despawn(networkObject);
-                networkPlayer.Remove(player);
-            }
-        }
-        else { // Left Server Change Host
-            
+        if (NetworkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
+            runner.Despawn(networkObject);
+            NetworkPlayer.Remove(player);
+            networkPlayerUpdateAction?.Invoke();
         }
     }
 

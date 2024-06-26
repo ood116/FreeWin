@@ -12,6 +12,9 @@ public class OpenSceneEditor : EditorWindow
     [MenuItem("Editor_BW/OpenScene/3. Session")]
     static void Session() => SceneOpen(2);
 
+    [MenuItem("Editor_BW/OpenScene/4. UITemp")]
+    static void UITemp() => SceneOpen(3);
+
     static public void SceneOpen(int SceneIndex)
     {
         var pathOfFirstScene = EditorBuildSettings.scenes[SceneIndex].path;
