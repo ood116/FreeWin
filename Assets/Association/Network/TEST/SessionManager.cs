@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System.Linq;
 
-public class SessionManager : MonoBehaviour
+public class SessionManager : NetworkBehaviour
 {
     public static SessionManager instance;
     private string nickName;
     private string roomName;
 
-    private string[] playerName = new string[10];
+    [SerializeField] private string[] playerName = new string[10];
 
     private void OnGUI()
     {
@@ -56,33 +57,44 @@ public class SessionManager : MonoBehaviour
         roomName = NetworkManager.instance.runner.SessionInfo.Name;
     }
 
-    public void SetSessionPlayers()
-    {
-        if (!NetworkManager.instance.runner.IsServer) return;
-        
-        SessionInfo session = NetworkManager.instance.runner.SessionInfo;
-
-        playerName[0] = "현재 " + NetworkManager.instance.NetworkPlayer.Count + "명 / 최대 " + session.MaxPlayers + "명";
-
-        Debug.Log("123 " + NetworkManager.instance.NetworkPlayer.Count);
-        int p_Num = 1;
-        foreach (var playerKey in NetworkManager.instance.NetworkPlayer.Keys) {
-            var value = NetworkManager.instance.NetworkPlayer[playerKey];
-            Debug.Log("123 " + value.GetComponent<NetworkUserData>().nickName);
-            playerName[p_Num++] = value.GetComponent<NetworkUserData>().nickName;
-        }
-        for (int i = p_Num; i < playerName.Length; ++i) {
-            playerName[i] = "";
-        }
-    }
-
     private void OnEnable()
     {
+        if (!NetworkManager.instance.runner.IsServer) return;
+
         NetworkManager.instance.networkPlayerUpdateAction += SetSessionPlayers;
     }
 
     private void OnDisable()
     {
+        if (!NetworkManager.instance.runner.IsServer) return;
+
         NetworkManager.instance.networkPlayerUpdateAction -= SetSessionPlayers;
+    }
+
+    public void SetSessionPlayers()
+    {
+        SessionInfo session = NetworkManager.instance.runner.SessionInfo;
+
+        playerName[0] = "현재 " + NetworkManager.instance.NetworkPlayer.Count + "명 / 최대 " + session.MaxPlayers + "명";
+
+        int p_Num = 1;
+        foreach (var playerKey in NetworkManager.instance.NetworkPlayer.Keys) {
+            var value = NetworkManager.instance.NetworkPlayer[playerKey];
+            playerName[p_Num++] = value.GetComponent<NetworkUserData>().nickName;
+        }
+        for (int i = p_Num; i < playerName.Length; ++i) {
+            playerName[i] = "";
+        }
+
+        RPC_GetSessionPlayers(playerName);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_GetSessionPlayers(string[] _playerName)
+    {
+        Debug.Log("Asdasdasd");
+        if (!NetworkManager.instance.runner.IsServer) {
+            this.playerName = _playerName.ToArray();
+        }
     }
 }

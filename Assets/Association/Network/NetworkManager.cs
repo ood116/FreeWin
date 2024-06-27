@@ -24,7 +24,11 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     public Dictionary<PlayerRef, NetworkObject> NetworkPlayer
     {
         get { return networkPlayer; }
-        set { networkPlayer = value; networkPlayerUpdateAction?.Invoke(); }
+        set 
+        {   
+            networkPlayer = value;
+            networkPlayerUpdateAction?.Invoke(); 
+        }
     }
     
     // ETC
@@ -107,7 +111,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
             NetworkObject networkPlayerObject = runner.Spawn(playerObj, Vector2.zero, Quaternion.identity, player);
             networkPlayerObject.name = networkPlayerObject.InputAuthority.ToString();
             NetworkPlayer.Add(player, networkPlayerObject);
-            networkPlayerUpdateAction?.Invoke(); // 닉네임 이 바로 변경 되지 않기 때문에 개선 필요 (현재 Player - NetworkUserData 에서 작동 됨)
+            //networkPlayerUpdateAction?.Invoke(); // 닉네임 이 바로 변경 되지 않기 때문에 개선 필요 (현재 Player - NetworkUserData 에서 작동 됨)
         }
     }
 
