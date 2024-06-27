@@ -12,11 +12,11 @@ public class SessionListManager : MonoBehaviour
     [SerializeField] private UIControls uIControls;
     [SerializeField] private UICreationControls uICreationControls;
 
-    [Header("===Room Button===")]
-    [Tooltip("방 버튼 부모")] public Transform roomlistPannel;
-    [Tooltip("방 버튼 부모")] public GameObject room_Prefab;
-    [Tooltip("방 버튼 개수 설정")] public int roomButtonCount = 8;
-    private List<Button> roomButton;
+    [Header("===Session Button===")]
+    [Tooltip("방 버튼 부모")] public Transform sessionlistPannel;
+    [Tooltip("방 버튼 부모")] public GameObject session_Prefab;
+    [Tooltip("방 버튼 개수 설정")] public int sessionButtonCount = 8;
+    private List<Button> sessionButton;
 
     [Header("===Pgae Button===")]
     [SerializeField] private Button previous_Page_Button;
@@ -34,35 +34,36 @@ public class SessionListManager : MonoBehaviour
 
     private void RoomButtonSetting()
     {
-        // Set Size
-        roomlistPannel.TryGetComponent<GridLayoutGroup>(out GridLayoutGroup gridLayoutGroup);
+        // Init Size
+        sessionlistPannel.TryGetComponent<GridLayoutGroup>(out GridLayoutGroup gridLayoutGroup);
         gridLayoutGroup.cellSize = new Vector2(uIControls.sizeHor * 3f, uIControls.sizeVer);
 
-        roomlistPannel.TryGetComponent<RectTransform>(out RectTransform roomlistPannelRect);
-        roomlistPannelRect.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x * 2, gridLayoutGroup.cellSize.y * Mathf.CeilToInt(roomButtonCount / 2));
+        sessionlistPannel.TryGetComponent<RectTransform>(out RectTransform sessionlistPannelRect);
+        sessionlistPannelRect.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x * 2, gridLayoutGroup.cellSize.y * Mathf.CeilToInt(sessionButtonCount / 2));
 
-        // Set Position
+        // Init Position
         this.TryGetComponent<RectTransform>(out RectTransform rectTransform);
         rectTransform.position = new Vector2(uIControls.selectArea.position.x + uIControls.sizeHor * 3f, uIControls.selectArea.position.y + uIControls.sizeVer * -10f);
 
+        // Init Pre, Next Button
         previous_Page_Button.TryGetComponent<RectTransform>(out RectTransform preRectTransform);
         preRectTransform.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x, gridLayoutGroup.cellSize.y);
-        preRectTransform.position = new Vector2(rectTransform.position.x, rectTransform.position.y - roomlistPannelRect.sizeDelta.y);
+        preRectTransform.position = new Vector2(rectTransform.position.x, rectTransform.position.y - sessionlistPannelRect.sizeDelta.y);
 
         next_Page_Button.TryGetComponent<RectTransform>(out RectTransform nextRectTransform);
         nextRectTransform.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x, gridLayoutGroup.cellSize.y);
-        nextRectTransform.position = new Vector2(rectTransform.position.x + preRectTransform.rect.width, rectTransform.position.y - roomlistPannelRect.sizeDelta.y);
+        nextRectTransform.position = new Vector2(rectTransform.position.x + preRectTransform.rect.width, rectTransform.position.y - sessionlistPannelRect.sizeDelta.y);
         
         // Remove Room Button
-        foreach (Transform child in roomlistPannel) {
+        foreach (Transform child in sessionlistPannel) {
             Destroy(child.gameObject) ;
         }
 
-        // Set Room Button
-        roomButton = new List<Button>();
-        for (int i = 0; i < roomButtonCount; ++i) {
-            GameObject roomBtn = Instantiate(room_Prefab, roomlistPannel);
-            roomButton.Add(roomBtn.GetComponent<Button>());
+        // Init Room Button
+        sessionButton = new List<Button>();
+        for (int i = 0; i < sessionButtonCount; ++i) {
+            GameObject roomBtn = Instantiate(session_Prefab, sessionlistPannel);
+            sessionButton.Add(roomBtn.GetComponent<Button>());
         }
     }
 
@@ -91,25 +92,25 @@ public class SessionListManager : MonoBehaviour
     private void UpdateRoomList()
     {
         // Calculate Page
-        maxPage = (sessionList.Count % roomButton.Count == 0) ? sessionList.Count / roomButton.Count : sessionList.Count / roomButton.Count + 1;
+        maxPage = (sessionList.Count % sessionButton.Count == 0) ? sessionList.Count / sessionButton.Count : sessionList.Count / sessionButton.Count + 1;
 
         // Button Setting
         previous_Page_Button.interactable = (currentPage <= 1) ? false : true;
         next_Page_Button.interactable = (currentPage >= maxPage) ? false : true;
 
-        multiple = (currentPage - 1) * roomButton.Count;
-        for (int i = 0; i < roomButton.Count; ++i) {
+        multiple = (currentPage - 1) * sessionButton.Count;
+        for (int i = 0; i < sessionButton.Count; ++i) {
             int num = i;
             if (multiple + i < sessionList.Count) {
-                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionList[multiple + num].Name;
-                roomButton[i].interactable = true;
+                sessionButton[i].GetComponentInChildren<TextMeshProUGUI>().text = sessionList[multiple + num].Name;
+                sessionButton[i].interactable = true;
 
-                roomButton[i].onClick.RemoveAllListeners();
-                roomButton[i].onClick.AddListener(() => JoinRoom(sessionList[multiple + num].Name));
+                sessionButton[i].onClick.RemoveAllListeners();
+                sessionButton[i].onClick.AddListener(() => JoinRoom(sessionList[multiple + num].Name));
             }
             else {
-                roomButton[i].GetComponentInChildren<TextMeshProUGUI>().text = "";
-                roomButton[i].interactable = false;
+                sessionButton[i].GetComponentInChildren<TextMeshProUGUI>().text = "";
+                sessionButton[i].interactable = false;
             }
         }
     }

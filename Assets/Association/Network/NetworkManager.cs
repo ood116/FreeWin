@@ -15,6 +15,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     public NetworkRunner runner;
 
     // Session
+    [ReadOnly] public int playerCount = 16;
     public Action<List<SessionInfo>> sessionListUpdateAction;
     public List<SessionInfo> sessionList = new List<SessionInfo>();
 
@@ -79,6 +80,8 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         {
             GameMode = gameMode,
             SessionName = sessionName,
+            CustomLobbyName = "Defualt",
+            PlayerCount = playerCount,
             Scene = scene,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });

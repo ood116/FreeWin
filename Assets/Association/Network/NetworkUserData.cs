@@ -11,5 +11,5 @@ public class NetworkUserData : NetworkBehaviour
     public override void Spawned() { if (Object.HasInputAuthority) RPC_SetNickName(UserData.instance.nickName); }
 
     // NickName Update
-    public void NickNameChanged() { SessionManager.instance.SetSessionPlayers(); }
+    public void NickNameChanged() { NetworkManager.instance.networkPlayerUpdateAction?.Invoke(); }
 }

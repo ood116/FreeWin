@@ -176,9 +176,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uIControls: {fileID: 357702575}
   uICreationControls: {fileID: 357702574}
-  roomlistPannel: {fileID: 1749453322}
-  room_Prefab: {fileID: 6775875326271904684, guid: d70b00cbea8203a43aa72596a475f905, type: 3}
-  roomButtonCount: 8
+  sessionlistPannel: {fileID: 1749453322}
+  session_Prefab: {fileID: 6775875326271904684, guid: d70b00cbea8203a43aa72596a475f905, type: 3}
+  sessionButtonCount: 8
   previous_Page_Button: {fileID: 805364651}
   next_Page_Button: {fileID: 682890631}
 --- !u!1 &181513625
@@ -1209,7 +1209,7 @@ GameObject:
   - component: {fileID: 1749453323}
   - component: {fileID: 1749453325}
   m_Layer: 5
-  m_Name: RoomListPannel
+  m_Name: SessionListPannel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
