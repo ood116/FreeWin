@@ -13,19 +13,15 @@ using System.Reflection;
 public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallbacks
 {
     public NetworkRunner runner;
+    [ReadOnly] public int playerCount = 16;
 
     // Session
-    [ReadOnly] public int playerCount = 16;
     public Action<List<SessionInfo>> sessionListUpdateAction;
     public List<SessionInfo> sessionList = new List<SessionInfo>();
     public List<SessionInfo> SessionList
     {
         get { return sessionList; }
-        set 
-        {   
-            sessionList = value;
-            sessionListUpdateAction?.Invoke(value); 
-        }
+        set { sessionList = value; sessionListUpdateAction?.Invoke(value); }
     }
 
     // Player
@@ -34,11 +30,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     public Dictionary<PlayerRef, NetworkObject> NetworkPlayer
     {
         get { return networkPlayer; }
-        set 
-        {   
-            networkPlayer = value;
-            networkPlayerUpdateAction?.Invoke(); 
-        }
+        set { networkPlayer = value; networkPlayerUpdateAction?.Invoke(); }
     }
     
     // ETC
@@ -60,13 +52,13 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         isConnecting = true;
 
         // Go to Lobby
-        var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
+        var result = await runner.JoinSessionLobby(SessionLobby.Shared);
         
         // Call Back
         if (result.Ok) {
             SceneManager.LoadScene("Assets/Association/_Scene/Lobby.unity");
-            runner.ProvideInput = false;
             callBack?.Invoke();
+            Debug.Log("sdfsd " + runner.LobbyInfo.IsValid + " " +runner.LobbyInfo.Name);
             isConnecting = false;
         }
     }
@@ -78,7 +70,10 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         if (isConnecting) return;
         isConnecting = true;
         
-        // Set Session Scene
+        if (!runner.IsCloudReady) {
+            await runner.JoinSessionLobby(SessionLobby.Shared);
+        }
+
         string sessionSceneName = "Assets/Association/_Scene/" + sceneName + ".unity";
         var scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(sessionSceneName));
         var sceneInfo = new NetworkSceneInfo();
@@ -112,7 +107,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         
         // Reset And Goto Lobby
         await runner.Shutdown(true, ShutdownReason.Ok);
-        ConnectToLobby();
+        NetworkManager.instance.ConnectToLobby();
     }
 #endregion
 
@@ -124,6 +119,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
             NetworkObject networkPlayerObject = runner.Spawn(playerObj, Vector2.zero, Quaternion.identity, player);
             networkPlayerObject.name = networkPlayerObject.InputAuthority.ToString();
             NetworkPlayer.Add(player, networkPlayerObject);
+            networkPlayerUpdateAction?.Invoke(); 
         }
     }
 
@@ -132,6 +128,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         if (NetworkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
             runner.Despawn(networkObject);
             NetworkPlayer.Remove(player);
+            networkPlayerUpdateAction?.Invoke(); 
         }
     }
 

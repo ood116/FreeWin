@@ -31,7 +31,7 @@ public class SessionManager : MonoBehaviour
 
         if (NetworkManager.instance.GetRunnerState() != NetworkRunner.States.Running) {
 #if UNITY_EDITOR
-            NetworkManager.instance.ConnectSession("Session_Editor", GameMode.AutoHostOrClient, callBack: GetSession);
+            NetworkManager.instance.ConnectSession("Session_Editor_" + Random.Range(0, 99999), GameMode.AutoHostOrClient, callBack: GetSession);
 #else
             Lobby();
 #endif
