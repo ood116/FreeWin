@@ -9,9 +9,16 @@ enum ChatTag { Channel_All, Channel_1, Channel_2, Channel_3, Channel_4, Channel_
 public class ChatManager : NetworkBehaviour
 {
     public GameObject chat_Prefab;
-    public Transform chatContent;
+    public RectTransform rect;
+    public RectTransform scrollView;
+    public RectTransform chatContent;
     public TMP_InputField chatInput;
     [SerializeField] private ChatTag chatTag = ChatTag.Channel_All;
+
+    private void Awake()
+    {
+        this.TryGetComponent<RectTransform>(out rect);
+    }
 
     private void Update()
     {
@@ -52,7 +59,9 @@ public class ChatManager : NetworkBehaviour
     public void RPC_MsgSend(string msg, int chatTag, Color color)
     {
         if (this.chatTag == (ChatTag)chatTag) {
+            float previous_Content_Height = chatContent.sizeDelta.y;
             InstantiateChat(msg).GetComponentInChildren<TextMeshProUGUI>().color = color;
+            StartCoroutine(AutoScrollDown(previous_Content_Height));
         }
     }
 
@@ -61,6 +70,18 @@ public class ChatManager : NetworkBehaviour
     public void RPC_MsgSend([RpcTarget] PlayerRef player, string msg, Color color)
     {
         InstantiateChat(msg).GetComponentInChildren<TextMeshProUGUI>().color = color;
+    }
+
+    // Auto ScrollDown
+    private IEnumerator AutoScrollDown(float previous_Content_Height)
+    {
+        yield return null;
+
+        if (chatContent.sizeDelta.y > scrollView.sizeDelta.y + rect.sizeDelta.y) {
+            if (chatContent.anchoredPosition.y + rect.sizeDelta.y >= previous_Content_Height - scrollView.sizeDelta.y) {
+                chatContent.anchoredPosition = new Vector2(0, chatContent.sizeDelta.y - scrollView.sizeDelta.y +  + rect.sizeDelta.y);
+            }
+        }
     }
 
     private GameObject InstantiateChat(string _msg)
