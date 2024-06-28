@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
-public class SessionManager : NetworkBehaviour
+public class SessionManager : MonoBehaviour
 {
     public static SessionManager instance;
     private string nickName;

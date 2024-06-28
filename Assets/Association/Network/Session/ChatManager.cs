@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Fusion;
 using TMPro;
 
-public class ChatManager : NetworkBehaviour
+public class ChatManager : NetworkBehaviour, IPlayerJoined
 {
     public GameObject chat_Prefab;
     public Transform chatContent;
@@ -49,5 +49,10 @@ public class ChatManager : NetworkBehaviour
         GameObject chatObj = Instantiate(chat_Prefab, chatContent);
         chatObj.GetComponentInChildren<TextMeshProUGUI>().text = msg;
         return chatObj;
+    }
+
+    public void PlayerJoined(PlayerRef player)
+    {
+        throw new System.NotImplementedException();
     }
 }

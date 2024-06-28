@@ -26,6 +26,7 @@ public class SessionInfoManager : NetworkBehaviour
     private IEnumerator Start()
     {
         yield return new WaitUntil(() => NetworkManager.instance.GetRunnerState() == NetworkRunner.States.Running);
+        yield return new WaitUntil(() => NetworkManager.instance.runner.IsCloudReady);
         
         NetworkManager.instance.networkPlayerUpdateAction += SetSessionPlayers;
         NetworkManager.instance.networkPlayerUpdateAction?.Invoke();

@@ -126,7 +126,7 @@ public class SessionListManager : MonoBehaviour
     private void OnEnable()
     {
         NetworkManager.instance.sessionListUpdateAction += SessionListUpdate;
-        SessionListUpdate(NetworkManager.instance.sessionList);
+        SessionListUpdate(NetworkManager.instance.SessionList);
     }
 
     private void OnDisable()

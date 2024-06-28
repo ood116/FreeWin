@@ -33,10 +33,6 @@ public class LobbyManager : MonoBehaviour
     {
         nickName = UserData.instance.nickName;
         roomName = "Session_" + Random.Range(0, 999999);
-
-        if (NetworkManager.instance.GetRunnerState() != NetworkRunner.States.Starting) {
-            NetworkManager.instance.ConnectToLobby();
-        }
     }
 
     public void Create() => NetworkManager.instance.ConnectSession(roomName, GameMode.Host);

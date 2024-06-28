@@ -18,6 +18,15 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     [ReadOnly] public int playerCount = 16;
     public Action<List<SessionInfo>> sessionListUpdateAction;
     public List<SessionInfo> sessionList = new List<SessionInfo>();
+    public List<SessionInfo> SessionList
+    {
+        get { return sessionList; }
+        set 
+        {   
+            sessionList = value;
+            sessionListUpdateAction?.Invoke(value); 
+        }
+    }
 
     // Player
     public Action networkPlayerUpdateAction;
@@ -33,7 +42,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     }
     
     // ETC
-    private bool isConnecting = false;
+    public bool isConnecting = false;
 
     private void Awake()
     {
@@ -48,6 +57,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     async public void ConnectToLobby(Action callBack = null)
     {
         if (isConnecting) return;
+        isConnecting = true;
 
         // Go to Lobby
         var result = await runner.JoinSessionLobby(SessionLobby.Shared, "Defualt");
@@ -66,7 +76,8 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     async public void ConnectSession(string sessionName, GameMode gameMode, string sceneName = "Session", Action callBack = null)
     {
         if (isConnecting) return;
-
+        isConnecting = true;
+        
         // Set Session Scene
         string sessionSceneName = "Assets/Association/_Scene/" + sceneName + ".unity";
         var scene = SceneRef.FromIndex(SceneUtility.GetBuildIndexByScenePath(sessionSceneName));
@@ -80,7 +91,6 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         {
             GameMode = gameMode,
             SessionName = sessionName,
-            CustomLobbyName = "Defualt",
             PlayerCount = playerCount,
             Scene = scene,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
@@ -99,7 +109,7 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
     async public void DisConnectSession()
     {
         if (isConnecting) return;
-
+        
         // Reset And Goto Lobby
         await runner.Shutdown(true, ShutdownReason.Ok);
         ConnectToLobby();
@@ -114,7 +124,6 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
             NetworkObject networkPlayerObject = runner.Spawn(playerObj, Vector2.zero, Quaternion.identity, player);
             networkPlayerObject.name = networkPlayerObject.InputAuthority.ToString();
             NetworkPlayer.Add(player, networkPlayerObject);
-            //networkPlayerUpdateAction?.Invoke(); // 닉네임 이 바로 변경 되지 않기 때문에 개선 필요 (현재 Player - NetworkUserData 에서 작동 됨)
         }
     }
 
@@ -123,15 +132,13 @@ public class NetworkManager : MonoSingleton<NetworkManager>, INetworkRunnerCallb
         if (NetworkPlayer.TryGetValue(player, out NetworkObject networkObject)) {
             runner.Despawn(networkObject);
             NetworkPlayer.Remove(player);
-            networkPlayerUpdateAction?.Invoke();
         }
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        this.sessionList.Clear();
-        this.sessionList = sessionList.ToList();
-        sessionListUpdateAction?.Invoke(sessionList);
+        this.SessionList.Clear();
+        this.SessionList = sessionList.ToList();
     }
 #endregion
 
