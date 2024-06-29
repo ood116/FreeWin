@@ -227,6 +227,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3e9b71faab0c842aa3572be4f06ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uIControls: {fileID: 1876991025}
+  uICreationControls: {fileID: 1876991024}
 --- !u!4 &190445286
 Transform:
   m_ObjectHideFlags: 0
@@ -1057,53 +1059,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3316866251460989141, guid: 87b286132aba6a24494c62af4973cedf, type: 3}
   m_PrefabInstance: {fileID: 1255155115}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1087083841
-GameObject:
-  m_ObjectHideFlags: 8
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1087083843}
-  - component: {fileID: 1087083842}
-  m_Layer: 0
-  m_Name: Fusion_PhotonBackgroundConnectionHandler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1087083842
-MonoBehaviour:
-  m_ObjectHideFlags: 8
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087083841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1222927710, guid: 7de3b8b9e1263ad479e2d0c4261b7646, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DisconnectAfterKeepAlive: 0
-  KeepAliveInBackground: 60000
-  ApplyDontDestroyOnLoad: 1
---- !u!4 &1087083843
-Transform:
-  m_ObjectHideFlags: 8
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087083841}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1242678805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1541,6 +1496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uIControls: {fileID: 1876991025}
   uICreationControls: {fileID: 1876991024}
+  button_Prefab: {fileID: 5442215688607170080, guid: 80452e1d09ac3a442a8d66bedd15e696, type: 3}
   sessionInfo_Prefab: {fileID: 5760830295438118678, guid: 06f9f45978db8724ebdafbf98e0292aa, type: 3}
   playerInfo_Prefab: {fileID: 2792147235998496137, guid: 87b286132aba6a24494c62af4973cedf, type: 3}
   playerInfoContent: {fileID: 1696264961}
@@ -2304,4 +2260,3 @@ SceneRoots:
   - {fileID: 1352859334}
   - {fileID: 1570942849}
   - {fileID: 1000244723}
-  - {fileID: 1087083843}

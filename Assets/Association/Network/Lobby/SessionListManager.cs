@@ -11,6 +11,9 @@ public class SessionListManager : MonoBehaviour
     [Header("===Reference===")]
     [SerializeField] private UIControls uIControls;
     [SerializeField] private UICreationControls uICreationControls;
+    private Vector2 ui_Position;
+    private float ui_Width;
+    private float ui_Height;
 
     [Header("===Session Button===")]
     [Tooltip("방 버튼 부모")] public Transform sessionlistPannel;
@@ -26,30 +29,38 @@ public class SessionListManager : MonoBehaviour
 
     private void Awake()
     {
-        RoomButtonSetting();
-        
+        SetUISize();
+        RoomButtonSetting(); 
         previous_Page_Button.onClick.AddListener(() => Previous_Page());
         next_Page_Button.onClick.AddListener(() => Next_Page());
+    }
+
+    private void SetUISize()
+    {
+        ui_Width = uIControls.sizeHor;
+        ui_Height = uIControls.sizeVer;
+        ui_Position = uIControls.selectArea.position;
     }
 
     private void RoomButtonSetting()
     {
         // Init Size
         sessionlistPannel.TryGetComponent<GridLayoutGroup>(out GridLayoutGroup gridLayoutGroup);
-        gridLayoutGroup.cellSize = new Vector2(uIControls.sizeHor * 3f, uIControls.sizeVer);
+        gridLayoutGroup.cellSize = new Vector2(ui_Width * 3f, ui_Height);
 
         sessionlistPannel.TryGetComponent<RectTransform>(out RectTransform sessionlistPannelRect);
         sessionlistPannelRect.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x * 2, gridLayoutGroup.cellSize.y * Mathf.CeilToInt(sessionButtonCount / 2));
 
         // Init Position
         this.TryGetComponent<RectTransform>(out RectTransform rectTransform);
-        rectTransform.position = new Vector2(uIControls.selectArea.position.x + uIControls.sizeHor * 3f, uIControls.selectArea.position.y + uIControls.sizeVer * -10f);
+        rectTransform.position = new Vector2(ui_Position.x + ui_Width, ui_Position.y + ui_Height * -8f);
 
-        // Init Pre, Next Button
+        // Init Pre Button
         previous_Page_Button.TryGetComponent<RectTransform>(out RectTransform preRectTransform);
         preRectTransform.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x, gridLayoutGroup.cellSize.y);
         preRectTransform.position = new Vector2(rectTransform.position.x, rectTransform.position.y - sessionlistPannelRect.sizeDelta.y);
 
+        // Init Next Button
         next_Page_Button.TryGetComponent<RectTransform>(out RectTransform nextRectTransform);
         nextRectTransform.sizeDelta = new Vector2(gridLayoutGroup.cellSize.x, gridLayoutGroup.cellSize.y);
         nextRectTransform.position = new Vector2(rectTransform.position.x + preRectTransform.rect.width, rectTransform.position.y - sessionlistPannelRect.sizeDelta.y);

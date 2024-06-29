@@ -4,12 +4,20 @@ using UnityEngine;
 using Fusion;
 using System.Linq;
 using TMPro;
+using UnityEngine.UI;
 
 public class SessionInfoManager : NetworkBehaviour
 {
     [Header("===Reference===")]
     [SerializeField] private UIControls uIControls;
     [SerializeField] private UICreationControls uICreationControls;
+    private Vector2 ui_Position;
+    private float ui_Width;
+    private float ui_Height;
+
+    [Header("===GotoLobby===")]
+    [SerializeField] private GameObject button_Prefab;
+    private Button gotoLobbyButton;
 
     [Header("===Info===")]
     [SerializeField] private GameObject sessionInfo_Prefab;
@@ -20,7 +28,11 @@ public class SessionInfoManager : NetworkBehaviour
 
     private void Awake()
     {
+        SetUISize();
+        ContentSetting();
         SessionInfoSetting();
+        PlayerInfoSetting();
+        GotoLobbySetting();
     }
 
     private IEnumerator Start()
@@ -32,20 +44,33 @@ public class SessionInfoManager : NetworkBehaviour
         NetworkManager.instance.networkPlayerUpdateAction?.Invoke();
     }
 
-    private void SessionInfoSetting()
+    private void SetUISize()
+    {
+        ui_Width = uIControls.sizeHor;
+        ui_Height = uIControls.sizeVer;
+        ui_Position = uIControls.selectArea.position;
+    }
+
+    private void ContentSetting()
     {
         // Init Content
         this.TryGetComponent<RectTransform>(out RectTransform rectTransform);
-        rectTransform.position = new Vector2(uIControls.selectArea.position.x, uIControls.selectArea.position.y);
-        rectTransform.sizeDelta = new Vector2(uIControls.sizeHor, uIControls.sizeVer * NetworkManager.instance.playerCount);
+        rectTransform.position = new Vector2(ui_Position.x, ui_Position.y);
+        rectTransform.sizeDelta = new Vector2(ui_Width, ui_Height * NetworkManager.instance.playerCount);
+    }
 
+    private void SessionInfoSetting()
+    {
         // Init SessionInfo
-        sessionInfo = Instantiate(playerInfo_Prefab, this.transform);
+        sessionInfo = Instantiate(sessionInfo_Prefab, this.transform);
         sessionInfo.TryGetComponent<RectTransform>(out RectTransform sessionInfoRect);
-        sessionInfoRect.sizeDelta = new Vector2(uIControls.sizeHor * 5f, uIControls.sizeVer);
+        sessionInfoRect.sizeDelta = new Vector2(ui_Width * 5f, ui_Height);
         sessionInfoRect.pivot = new Vector2(0, 1);
-        sessionInfoRect.position = new Vector2(uIControls.selectArea.position.x + (uIControls.sizeHor * 2f), uIControls.selectArea.position.y);
+        sessionInfoRect.position = new Vector2(ui_Position.x + (ui_Width * 2f), ui_Position.y);
+    }
 
+    private void PlayerInfoSetting()
+    {
         // Remove PlayerInfo
         foreach (Transform child in playerInfoContent) {
             Destroy(child.gameObject);
@@ -57,9 +82,22 @@ public class SessionInfoManager : NetworkBehaviour
         for (int i = 0; i < NetworkManager.instance.playerCount; ++i) {
             GameObject p_Info = Instantiate(playerInfo_Prefab, playerInfoContent);
             p_Info.TryGetComponent<RectTransform>(out RectTransform p_InfoRect);
-            p_InfoRect.sizeDelta = new Vector2(uIControls.sizeHor, uIControls.sizeVer);
+            p_InfoRect.sizeDelta = new Vector2(ui_Width, ui_Height);
             playerInfo.Add(p_Info);
         }
+    }
+
+    private void GotoLobbySetting()
+    {
+        Instantiate(button_Prefab, this.transform).TryGetComponent<Button>(out gotoLobbyButton);
+        gotoLobbyButton.onClick.RemoveAllListeners();
+        gotoLobbyButton.onClick.AddListener(() => NetworkManager.instance.DisConnectSession());
+        gotoLobbyButton.GetComponentInChildren<TextMeshProUGUI>().text = "Go To Lobby";
+
+        gotoLobbyButton.TryGetComponent<RectTransform>(out RectTransform gotoLobbyButtonRect);
+        gotoLobbyButtonRect.sizeDelta = new Vector2(ui_Width, ui_Height);
+        gotoLobbyButtonRect.pivot = new Vector2(0, 1);
+        gotoLobbyButtonRect.position = new Vector2(ui_Position.x + (ui_Width * 8f), ui_Position.y);
     }
 
     public void SetSessionPlayers()
