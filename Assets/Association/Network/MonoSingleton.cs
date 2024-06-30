@@ -17,11 +17,12 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
             {
                 if (isQuitting) return null;
 
+                _instance = (T)FindObjectOfType(typeof(T));
+
                 if (_instance == null) {
-                    GameObject singletonObj = new GameObject();
-                    _instance = singletonObj.AddComponent<T>();
-                    singletonObj.name = typeof(T).ToString();
-                    DontDestroyOnLoad(singletonObj.gameObject);
+                    _instance = new GameObject().AddComponent<T>();
+                    _instance.name = typeof(T).ToString();
+                    DontDestroyOnLoad(_instance.gameObject);
                 }
                 return _instance;
             }
