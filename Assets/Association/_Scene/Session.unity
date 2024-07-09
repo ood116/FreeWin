@@ -470,12 +470,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ac35843d095a7c46bf9dce684bd3d14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chat_Prefab: {fileID: 65944775786859009, guid: d04bb898310f85d48b4b594ff26f4271, type: 3}
   rect: {fileID: 0}
   scrollView: {fileID: 864939735}
   chatContent: {fileID: 991345487}
   chatInput: {fileID: 353460530}
   chatTag: 0
+  chat_Prefab: {fileID: 65944775786859009, guid: d04bb898310f85d48b4b594ff26f4271, type: 3}
 --- !u!1 &697329889
 GameObject:
   m_ObjectHideFlags: 0

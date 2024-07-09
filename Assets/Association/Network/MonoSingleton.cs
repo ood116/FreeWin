@@ -22,10 +22,16 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
                 if (_instance == null) {
                     _instance = new GameObject().AddComponent<T>();
                     _instance.name = typeof(T).ToString();
-                    DontDestroyOnLoad(_instance.gameObject);
                 }
                 return _instance;
             }
+        }
+    }
+
+    private void Awake()
+    {
+        if (instance == this) {
+            DontDestroyOnLoad(instance.gameObject);
         }
     }
 
